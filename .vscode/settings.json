@@ -1,0 +1,20 @@
+{
+	"[haxe]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "nadako.vshaxe"
+	},
+	"[json]": {
+		"editor.formatOnSave": true,
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	"files.trimFinalNewlines": true,
+	"files.trimTrailingWhitespace": true,
+	"files.eol": "\n",
+
+	"editor.insertSpaces": false,
+
+	"search.exclude": {
+		"**/export": true
+	}
+}
