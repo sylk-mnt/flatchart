@@ -43,7 +43,6 @@ final wrapper = FlatChart.detectAndWrapFormat(chartPath, format);
 - Add proper format detection
 
 ### Core Features
-- Add chart validation
 - Add chart conversion between formats
 - Add chart optimization utilities
 - Add support for HeapsFileSystem
