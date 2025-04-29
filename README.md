@@ -38,10 +38,11 @@ final wrapper = FlatChart.detectAndWrapFormat(chartPath, format);
 - Add support for Kade Engine format
 - Add support for V-Slice format
 
+### Legacy Format Issues
+- Add proper metadata loading
+- Add proper format detection
+
 ### Core Features
-- Add proper metadata loading for Legacy format
-- Add note loading for Legacy format
-- Add proper format detection for Legacy format
 - Add chart validation
 - Add chart conversion between formats
 - Add chart optimization utilities
