@@ -133,7 +133,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 
 		var currentBPM = json.bpm;
 		var currentTime = 0.0;
-		var lastMustHit = null;
+		var lastMustHit = false;
 
 		for (section in json.notes) {
 			if (section.changeBPM && section.bpm != currentBPM) {
