@@ -35,16 +35,12 @@ class OpenFlFileSystem implements IFileSystem {
 
 	public function readDirectory(path:String):Array<String> {
 		path = Path.addTrailingSlash(path);
-		#if sys
-		path = Path.normalize(sys.FileSystem.absolutePath(path));
-		#end
 
-		final assetIds = Assets.list().filter(assetId -> Assets.getPath(assetId).startsWith(path));
+		final assetIds = Assets.list().filter(assetId -> assetId.startsWith(path));
 
 		final result:Array<String> = [];
 		for (assetId in assetIds) {
-			final assetPath = Assets.getPath(assetId);
-			final trimmedPath = assetPath.substring(path.length).split('/')[0];
+			final trimmedPath = assetId.substring(path.length).split('/')[0];
 			if (!result.contains(trimmedPath))
 				result.push(trimmedPath);
 		}

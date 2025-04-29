@@ -1,5 +1,6 @@
 package flatchart;
 
+import haxe.PosInfos;
 import flatchart.format.Format;
 import flatchart.fs.IFileSystem;
 
@@ -33,7 +34,7 @@ import flatchart.fs.IFileSystem;
 	 * Callback function for logging events.
 	 * Takes a log level and message as parameters.
 	 */
-	public var onLog:(FlatChartLogLevel, String) -> Void = (_, _) -> {};
+	public var onLog:(FlatChartLogLevel, String, ?PosInfos) -> Void = (_, _, ?_) -> {};
 
 	/**
 	 * Minimum log level to call the `onLog` callback.
@@ -80,7 +81,7 @@ class FlatChart {
 		return wrapFormat(path, format);
 	}
 
-	public static function log(level:FlatChartLogLevel, message:String) {
+	public static function log(level:FlatChartLogLevel, message:String, ?pos:PosInfos) {
 		if ((level : Int) <= (config.logLevel : Int))
 			return;
 

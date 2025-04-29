@@ -32,20 +32,16 @@ final wrapper = FlatChart.detectAndWrapFormat(chartPath, format);
 ## TODO
 
 ### Format Support
-- Add support for Psych Engine format
 - Add support for Codename Engine format
 - Add support for FNF Forever Engine format
 - Add support for Kade Engine format
 - Add support for V-Slice format
 
-### Legacy Format Issues
-- Add proper metadata loading
-- Add proper format detection
-
 ### Core Features
 - Add chart conversion between formats
 - Add chart optimization utilities
 - Add support for HeapsFileSystem
+- Add proper format detection (WIP)
 
 ### Documentation
 - Add contribution guidelines

@@ -13,13 +13,13 @@ import haxe.Json;
 
 using StringTools;
 
-class LegacyFormat extends Format {
+class PsychFormat extends Format {
 	override function getName():String {
-		return 'Friday Night Funkin\' Legacy/0.2.x';
+		return 'Psych Engine';
 	}
 
-	override function createWrapper():LegacyFormatWrapper {
-		return new LegacyFormatWrapper(this);
+	override function createWrapper():PsychFormatWrapper {
+		return new PsychFormatWrapper(this);
 	}
 
 	override function isMatch(path:String):Bool {
@@ -50,8 +50,8 @@ class LegacyFormat extends Format {
 	}
 }
 
-class LegacyFormatWrapper extends FormatWrapper {
-	override function load(path:String):LegacyFormatWrapper {
+class PsychFormatWrapper extends FormatWrapper {
+	override function load(path:String):PsychFormatWrapper {
 		if (!FlatChart.config.fileSystem.directoryExists(path)) {
 			FlatChart.log(FlatChartLogLevel.Error, 'Directory not found: $path');
 			return this;
@@ -94,9 +94,9 @@ class LegacyFormatWrapper extends FormatWrapper {
 		final filepath = variation == FlatChart.config.defaultVariation ? Path.join([path, '${Path.withoutDirectory(path)}.json']) : Path.join([path, '${Path.withoutDirectory(path)}-$variation.json']);
 
 		#if hxjsonast
-		final json:LegacyRaw = Parser.parse(FlatChart.config.fileSystem.getBytes(filepath).toString(), filepath).getField('song').value.getValue();
+		final json:PsychRaw = Parser.parse(FlatChart.config.fileSystem.getBytes(filepath).toString(), filepath).getField('song').value.getValue();
 		#else
-		final json:LegacyRaw = Json.parse(FlatChart.config.fileSystem.getBytes(filepath).toString()).song;
+		final json:PsychRaw = Json.parse(FlatChart.config.fileSystem.getBytes(filepath).toString()).song;
 		#end
 
 		final result:FormatChart = {
@@ -115,7 +115,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 					}
 				],
 			},
-			tracks: [{sound: 'Inst', startTime: 0, endTime: 0}],
+			tracks: [{sound: 'Inst', startTime: json.offset ?? 0, endTime: 0}],
 			strumlines: [
 				{
 					x: 0.25,
@@ -137,19 +137,27 @@ class LegacyFormatWrapper extends FormatWrapper {
 					x: 0.25,
 					scale: 1,
 					alpha: 1,
-					characters: ['gf'],
+					characters: [json.gfVersion ?? json.player3 ?? 'gf'],
 					charactersPosition: 2,
 					cpuControlled: true
 				}
 			],
 			notes: [],
 			events: [],
-			stage: null,
-			extraData: new Map<String, Dynamic>()
+			stage: json.stage,
+			extraData: [
+				PsychExtraValue.GAME_OVER_CHAR => json.gameOverChar,
+				PsychExtraValue.GAME_OVER_SOUND => json.gameOverSound,
+				PsychExtraValue.GAME_OVER_LOOP => json.gameOverLoop,
+				PsychExtraValue.GAME_OVER_END => json.gameOverEnd,
+				PsychExtraValue.DISABLE_NOTE_RGB => json.disableNoteRGB,
+				PsychExtraValue.ARROW_SKIN => json.arrowSkin,
+				PsychExtraValue.SPLASH_SKIN => json.splashSkin
+			]
 		}
 
 		if (json.needsVoices)
-			result.tracks.push({sound: 'Voices', startTime: 0, endTime: 0});
+			result.tracks.push({sound: 'Voices', startTime: json.offset ?? 0, endTime: 0});
 
 		var currentBPM = json.bpm;
 		var currentTime = 0.0;
@@ -161,7 +169,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				result.metadata.bpmChanges.push({
 					time: currentTime,
 					bpm: currentBPM,
-					beatsPerMeasure: section.lengthInSteps * 0.25,
+					beatsPerMeasure: section.sectionBeats,
 					stepsPerBeat: 4
 				});
 			}
@@ -171,7 +179,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				result.events.push({
 					time: currentTime,
 					kind: 'Move Camera',
-					data: section.mustHitSection ? 1 : 0
+					data: section.gfSection ? 2 : (section.mustHitSection ? 1 : 0)
 				});
 			}
 
@@ -180,7 +188,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				var id:Int = note[1];
 				var length:Float = note[2];
 
-				var strumline = id >= 4 ? (section.mustHitSection ? 0 : 1) : (section.mustHitSection ? 1 : 0);
+				var strumline = section.gfSection ? 2 : (id >= 4 ? (section.mustHitSection ? 0 : 1) : (section.mustHitSection ? 1 : 0));
 				id %= 4;
 
 				result.notes.push({
@@ -191,7 +199,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				});
 			}
 
-			currentTime += section.lengthInSteps * 60 / currentBPM * 0.25 * 1000;
+			currentTime += section.sectionBeats * 60 / currentBPM * 1000;
 		}
 
 		FlatChart.log(FlatChartLogLevel.Debug, 'Loaded chart from $filepath');
@@ -199,22 +207,47 @@ class LegacyFormatWrapper extends FormatWrapper {
 	}
 }
 
-typedef LegacyRaw = {
+typedef PsychRaw = {
 	var song:String;
-	var notes:Array<LegacyRawSection>;
+	var notes:Array<PsychRawSection>;
 	var bpm:Float;
 	var needsVoices:Bool;
 	var speed:Float;
+	@:optional var offset:Null<Float>;
 
 	var player1:String;
 	var player2:String;
+	@:optional var player3:Null<String>;
+	@:optional var gfVersion:Null<String>;
+	@:optional var stage:Null<String>;
+
+	@:optional var gameOverChar:Null<String>;
+	@:optional var gameOverSound:Null<String>;
+	@:optional var gameOverLoop:Null<String>;
+	@:optional var gameOverEnd:Null<String>;
+
+	@:optional var disableNoteRGB:Null<Bool>;
+
+	@:optional var arrowSkin:Null<String>;
+	@:optional var splashSkin:Null<String>;
 }
 
-typedef LegacyRawSection = {
-	var sectionNotes:Array<Array<Dynamic>>;
-	var lengthInSteps:Int;
+typedef PsychRawSection = {
+	var sectionNotes:Array<Dynamic>;
+	var sectionBeats:Float;
 	var mustHitSection:Bool;
-	var bpm:Float;
-	var changeBPM:Bool;
-	var altAnim:Bool;
+	@:optional var altAnim:Null<Bool>;
+	@:optional var gfSection:Null<Bool>;
+	@:optional var bpm:Null<Float>;
+	@:optional var changeBPM:Null<Bool>;
+}
+
+enum abstract PsychExtraValue(String) from String to String {
+	var GAME_OVER_CHAR = 'gameOverChar';
+	var GAME_OVER_SOUND = 'gameOverSound';
+	var GAME_OVER_LOOP = 'gameOverLoop';
+	var GAME_OVER_END = 'gameOverEnd';
+	var DISABLE_NOTE_RGB = 'disableNoteRGB';
+	var ARROW_SKIN = 'arrowSkin';
+	var SPLASH_SKIN = 'splashSkin';
 }

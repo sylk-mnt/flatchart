@@ -8,7 +8,7 @@ class Format {
 	}
 
 	public function createWrapper():FormatWrapper {
-		return new FormatWrapper();
+		return new FormatWrapper(this);
 	}
 
 	public function isMatch(path:String):Bool {
@@ -17,10 +17,14 @@ class Format {
 }
 
 class FormatWrapper {
+	public final format:Format;
+
 	public var metadata:FormatMetadata;
 	public var charts:Array<FormatChart> = [];
 
-	public function new() {}
+	public function new(format:Format) {
+		this.format = format;
+	}
 
 	public function load(path:String):FormatWrapper {
 		return this;
@@ -58,6 +62,7 @@ class FormatWrapper {
 	public var notes:Array<FormatNote>;
 	public var events:Array<FormatEvent>;
 	public var stage:Null<String>;
+	public var extraData:Map<String, Dynamic>;
 }
 
 @:structInit class FormatTrack {
