@@ -38,7 +38,7 @@ import flatchart.fs.IFileSystem;
 	/**
 	 * Minimum log level to call the `onLog` callback.
 	 */
-	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.Debug;
+	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.Error;
 
 	/**
 	 * File system instance.
@@ -72,8 +72,10 @@ class FlatChart {
 
 	public static function detectAndWrapFormat(path:String):FormatWrapper {
 		final format = detectFormat(path);
-		if (format == null)
-			throw 'Format not found for $path';
+		if (format == null) {
+			FlatChart.log(FlatChartLogLevel.Error, 'Format not found for $path');
+			return null;
+		}
 
 		return wrapFormat(path, format);
 	}
