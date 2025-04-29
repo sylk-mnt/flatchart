@@ -8,10 +8,10 @@ module.exports = {
 
 	// Use double quotes.
 	singleQuote: false,
-	quoteProps: "preserve",
-	parser: "json",
+	quoteProps: 'preserve',
+	parser: 'json',
 
 	bracketSpacing: false, // Spacing between brackets in object literals.
-	trailingComma: "none", // No trailing commas.
+	trailingComma: 'none', // No trailing commas.
 	semi: false, // No semicolons at ends of statements.
 };
