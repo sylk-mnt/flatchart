@@ -82,8 +82,6 @@ class LegacyFormatWrapper extends FormatWrapper {
 		final variations = _readVariations(path);
 		FlatChart.log(FlatChartLogLevel.Info, 'Found variations in $path: ${variations.join(', ')}');
 
-		// TODO: Load metadata
-
 		for (variation in variations) {
 			final chart = _loadChart(path, variation);
 			if (chart == null) {
@@ -189,7 +187,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				result.events.push({
 					time: currentTime,
 					kind: 'Move Camera',
-					data: section.mustHitSection ? 1 : 0
+					data: {target: section.mustHitSection ? 1 : 0}
 				});
 			}
 

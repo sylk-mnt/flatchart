@@ -42,6 +42,8 @@ class PsychFormat extends Format {
 
 					final song = json.getField('song').value;
 
+					// TODO: Check events
+
 					if (song.getField('song') == null || song.getField('bpm') == null || song.getField('notes') == null)
 						return false;
 
@@ -52,7 +54,7 @@ class PsychFormat extends Format {
 					switch sections.value {
 						case JArray(sections):
 							for (section in sections) {
-								if (section.getField('sectionBeats') == null
+								if ((section.getField('sectionBeats') == null && section.getField('lengthInSteps') == null)
 									|| section.getField('sectionNotes') == null
 									|| section.getField('mustHitSection') == null)
 									return false;
@@ -84,8 +86,6 @@ class PsychFormatWrapper extends FormatWrapper {
 		final variations = _readVariations(path);
 		FlatChart.log(FlatChartLogLevel.Debug, 'Found variations in $path: ${variations.join(', ')}');
 
-		// TODO: Load metadata
-
 		for (variation in variations) {
 			final chart = _loadChart(path, variation);
 			if (chart == null) {
@@ -97,6 +97,8 @@ class PsychFormatWrapper extends FormatWrapper {
 			if (variation == FlatChart.config.defaultVariation)
 				metadata = chart.metadata;
 		}
+
+		// TODO: Load events
 
 		return this;
 	}
@@ -189,7 +191,7 @@ class PsychFormatWrapper extends FormatWrapper {
 				result.metadata.bpmChanges.push({
 					time: currentTime,
 					bpm: currentBPM,
-					beatsPerMeasure: section.sectionBeats,
+					beatsPerMeasure: section.sectionBeats != null ? section.sectionBeats : section.lengthInSteps * 0.25,
 					stepsPerBeat: 4
 				});
 			}
@@ -219,7 +221,7 @@ class PsychFormatWrapper extends FormatWrapper {
 				});
 			}
 
-			currentTime += section.sectionBeats * 60 / currentBPM * 1000;
+			currentTime += section.sectionBeats != null ? section.sectionBeats * 60 / currentBPM * 1000 : section.lengthInSteps * 60 / currentBPM * 0.25 * 1000;
 		}
 
 		FlatChart.log(FlatChartLogLevel.Debug, 'Loaded chart from $filepath');
@@ -230,6 +232,7 @@ class PsychFormatWrapper extends FormatWrapper {
 typedef PsychRaw = {
 	var song:String;
 	var notes:Array<PsychRawSection>;
+	var events:Array<Array<Dynamic>>;
 	var bpm:Float;
 	var needsVoices:Bool;
 	var speed:Float;
@@ -254,7 +257,8 @@ typedef PsychRaw = {
 
 typedef PsychRawSection = {
 	var sectionNotes:Array<Dynamic>;
-	var sectionBeats:Float;
+	@:optional var sectionBeats:Null<Float>;
+	@:optional var lengthInSteps:Null<Int>;
 	var mustHitSection:Bool;
 	@:optional var altAnim:Null<Bool>;
 	@:optional var gfSection:Null<Bool>;
