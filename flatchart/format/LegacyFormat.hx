@@ -3,14 +3,9 @@ package flatchart.format;
 import flatchart.FlatChart.FlatChartLogLevel;
 import haxe.io.Path;
 import flatchart.format.Format;
-#if hxjsonast
 import hxjsonast.Parser;
 
 using hxjsonast.Tools;
-#else
-import haxe.Json;
-#end
-
 using StringTools;
 
 class LegacyFormat extends Format {
@@ -37,13 +32,40 @@ class LegacyFormat extends Format {
 			&& !Lambda.exists(filenames, filename -> filename.startsWith('$prefix-') && filename.endsWith('.json')))
 			return false;
 
-		for (filename in filenames) {
-			if (!filename.endsWith('.json'))
-				continue;
-			if (filename == defaultFile)
-				continue;
-			if (!filename.startsWith('$prefix-'))
-				return false;
+		if (FlatChart.config.highDetectionAccuracy) {
+			for (filename in filenames) {
+				try {
+					final json = Parser.parse(FlatChart.config.fileSystem.getBytes(Path.join([path, filename])).toString(), filename);
+
+					if (json.getField('song') == null)
+						return false;
+
+					final song = json.getField('song').value;
+
+					if (song.getField('song') == null || song.getField('bpm') == null || song.getField('notes') == null)
+						return false;
+
+					final sections = song.getField('notes').value;
+					if (!sections.value.match(JArray(_)))
+						return false;
+
+					switch sections.value {
+						case JArray(sections):
+							for (section in sections) {
+								if (section.getField('lengthInSteps') == null
+									|| section.getField('sectionNotes') == null
+									|| section.getField('mustHitSection') == null)
+									return false;
+							}
+						case _:
+							return false;
+					}
+				}
+				catch (error) {
+					FlatChart.log(FlatChartLogLevel.Error, 'Error parsing $filename: $error');
+					continue;
+				}
+			}
 		}
 
 		return true;
@@ -93,11 +115,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 	private function _loadChart(path:String, variation:String):FormatChart {
 		final filepath = variation == FlatChart.config.defaultVariation ? Path.join([path, '${Path.withoutDirectory(path)}.json']) : Path.join([path, '${Path.withoutDirectory(path)}-$variation.json']);
 
-		#if hxjsonast
 		final json:LegacyRaw = Parser.parse(FlatChart.config.fileSystem.getBytes(filepath).toString(), filepath).getField('song').value.getValue();
-		#else
-		final json:LegacyRaw = Json.parse(FlatChart.config.fileSystem.getBytes(filepath).toString()).song;
-		#end
 
 		final result:FormatChart = {
 			variation: variation,

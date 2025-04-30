@@ -39,7 +39,7 @@ import flatchart.fs.IFileSystem;
 	/**
 	 * Minimum log level to call the `onLog` callback.
 	 */
-	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.Error;
+	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.Warn;
 
 	/**
 	 * File system instance.
@@ -50,6 +50,11 @@ import flatchart.fs.IFileSystem;
 	 * List of formats to use.
 	 */
 	public var formats:Array<Format> = [];
+
+	/**
+	 * Whether to use high detection accuracy.
+	 */
+	public var highDetectionAccuracy:Bool = false;
 }
 
 class FlatChart {
@@ -60,33 +65,35 @@ class FlatChart {
 	}
 
 	public static function detectFormat(path:String):Null<Format> {
+		log(FlatChartLogLevel.Info, 'Detecting format for $path');
 		for (format in config.formats) {
-			if (format.isMatch(path))
+			if (format.isMatch(path)) {
+				log(FlatChartLogLevel.Info, 'Format detected for $path: ${format.getName()}');
 				return format;
+			}
 		}
+		log(FlatChartLogLevel.Error, 'Format not detected for $path');
 		return null;
 	}
 
-	public static function wrapFormat(path:String, format:Format):FormatWrapper {
+	public static inline function wrapFormat(path:String, format:Format):FormatWrapper {
 		return format.createWrapper().load(path);
 	}
 
-	public static function detectAndWrapFormat(path:String):FormatWrapper {
+	public static inline function detectAndWrapFormat(path:String):Null<FormatWrapper> {
 		final format = detectFormat(path);
-		if (format == null) {
-			FlatChart.log(FlatChartLogLevel.Error, 'Format not found for $path');
+		if (format == null)
 			return null;
-		}
 
 		return wrapFormat(path, format);
 	}
 
 	public static function log(level:FlatChartLogLevel, message:String, ?pos:PosInfos) {
-		if ((level : Int) <= (config.logLevel : Int))
+		if ((level : Int) < (config.logLevel : Int))
 			return;
 
 		if (config.onLog != null)
-			config.onLog(level, message);
+			config.onLog(level, message, pos);
 	}
 }
 

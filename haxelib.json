@@ -6,5 +6,8 @@
 	"version": "0.0.1",
 	"url": "https://github.com/sylk-mnt/flatchart",
 	"tags": ["haxe", "fnf"],
-	"description": "Friday Night Funkin' chart formats wrapper"
+	"description": "Friday Night Funkin' chart formats wrapper",
+	"dependencies": {
+		"hxjsonast": ""
+	}
 }

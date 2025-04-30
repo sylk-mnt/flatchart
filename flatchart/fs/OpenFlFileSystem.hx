@@ -48,8 +48,10 @@ class OpenFlFileSystem implements IFileSystem {
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
-		if (!fileExists(path))
+		if (!fileExists(path)) {
+			FlatChart.log(FlatChartLogLevel.Error, 'There is no BINARY asset with ID "$path"');
 			return null;
+		}
 
 		return Assets.getBytes(path);
 	}
