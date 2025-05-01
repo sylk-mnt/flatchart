@@ -33,7 +33,7 @@ final wrapper = FlatChart.detectAndWrapFormat(chartPath, format);
 
 ### Format Support
 - Add support for Psych Engine format (WIP)
-- Add support for Codename Engine format
+- Add support for Codename Engine format (WIP)
 - Add support for FNF Forever Engine format
 - Add support for Kade Engine format
 - Add support for V-Slice format

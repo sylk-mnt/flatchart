@@ -5,15 +5,19 @@ import haxe.io.Bytes;
 import flatchart.FlatChart.FlatChartLogLevel;
 class OpenFlFileSystem implements IFileSystem {
 	public function new() {
-		FlatChart.log(FlatChartLogLevel.Error, 'OpenFL required to use OpenFlFileSystem');
-	}
-
-	public function readDirectory(path:String):Array<String> {
-		return [];
+		FlatChart.log(FlatChartLogLevel.ERROR, 'OpenFL required to use OpenFlFileSystem');
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
 		return null;
+	}
+
+	public function getText(path:String):Null<String> {
+		return null;
+	}
+
+	public function readDirectory(path:String):Array<String> {
+		return [];
 	}
 
 	public function directoryExists(path:String):Bool {
@@ -33,6 +37,24 @@ using StringTools;
 class OpenFlFileSystem implements IFileSystem {
 	public function new() {}
 
+	public function getBytes(path:String):Null<Bytes> {
+		if (!fileExists(path)) {
+			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			return null;
+		}
+
+		return Assets.getBytes(path);
+	}
+
+	public function getText(path:String):Null<String> {
+		if (!fileExists(path)) {
+			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			return null;
+		}
+
+		return Assets.getText(path);
+	}
+
 	public function readDirectory(path:String):Array<String> {
 		path = Path.addTrailingSlash(path);
 
@@ -45,15 +67,6 @@ class OpenFlFileSystem implements IFileSystem {
 				result.push(trimmedPath);
 		}
 		return result;
-	}
-
-	public function getBytes(path:String):Null<Bytes> {
-		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.Error, 'There is no BINARY asset with ID "$path"');
-			return null;
-		}
-
-		return Assets.getBytes(path);
 	}
 
 	public function directoryExists(path:String):Bool {

@@ -1,5 +1,6 @@
 package flatchart.format;
 
+import hxjsonast.Json.JsonValue;
 import flatchart.FlatChart.FlatChartLogLevel;
 import haxe.io.Path;
 import flatchart.format.Format;
@@ -32,10 +33,11 @@ class PsychFormat extends Format {
 			&& !Lambda.exists(filenames, filename -> filename.startsWith('$prefix-') && filename.endsWith('.json')))
 			return false;
 
-		if (FlatChart.config.highDetectionAccuracy) {
+		if (FlatChart.config.readFileContents) {
 			for (filename in filenames) {
 				try {
-					final json = Parser.parse(FlatChart.config.fileSystem.getBytes(Path.join([path, filename])).toString(), filename);
+					final filepath = Path.join([path, filename]);
+					final json = Parser.parse(FlatChart.config.fileSystem.getText(filepath), filepath);
 
 					if (json.getField('song') == null)
 						return false;
@@ -48,11 +50,11 @@ class PsychFormat extends Format {
 						return false;
 
 					final sections = song.getField('notes').value;
-					if (!sections.value.match(JArray(_)))
+					if (!sections.value.match(JsonValue.JArray(_)))
 						return false;
 
 					switch sections.value {
-						case JArray(sections):
+						case JsonValue.JArray(sections):
 							for (section in sections) {
 								if ((section.getField('sectionBeats') == null && section.getField('lengthInSteps') == null)
 									|| section.getField('sectionNotes') == null
@@ -64,12 +66,12 @@ class PsychFormat extends Format {
 					}
 				}
 				catch (error) {
-					FlatChart.log(FlatChartLogLevel.Error, 'Error parsing $filename: $error');
+					FlatChart.log(FlatChartLogLevel.ERROR, 'Error parsing $filename: $error');
 					continue;
 				}
 			}
 
-			FlatChart.log(FlatChartLogLevel.Debug, 'Found valid chart in $path');
+			FlatChart.log(FlatChartLogLevel.DEBUG, 'Found valid chart in $path');
 		}
 
 		return true;
@@ -77,25 +79,26 @@ class PsychFormat extends Format {
 }
 
 class PsychFormatWrapper extends FormatWrapper {
+	public function new(format:PsychFormat) {
+		super(format);
+	}
+
 	override function load(path:String):PsychFormatWrapper {
 		if (!FlatChart.config.fileSystem.directoryExists(path)) {
-			FlatChart.log(FlatChartLogLevel.Error, 'Directory not found: $path');
+			FlatChart.log(FlatChartLogLevel.ERROR, 'Directory not found: $path');
 			return this;
 		}
 
 		final variations = _readVariations(path);
-		FlatChart.log(FlatChartLogLevel.Debug, 'Found variations in $path: ${variations.join(', ')}');
+		FlatChart.log(FlatChartLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
 		for (variation in variations) {
 			final chart = _loadChart(path, variation);
 			if (chart == null) {
-				FlatChart.log(FlatChartLogLevel.Error, 'Failed to load chart for variation $variation');
+				FlatChart.log(FlatChartLogLevel.ERROR, 'Failed to load chart for variation $variation');
 				continue;
 			}
 			charts.push(chart);
-
-			if (variation == FlatChart.config.defaultVariation)
-				metadata = chart.metadata;
 		}
 
 		// TODO: Load events
@@ -119,7 +122,7 @@ class PsychFormatWrapper extends FormatWrapper {
 	private function _loadChart(path:String, variation:String):FormatChart {
 		final filepath = variation == FlatChart.config.defaultVariation ? Path.join([path, '${Path.withoutDirectory(path)}.json']) : Path.join([path, '${Path.withoutDirectory(path)}-$variation.json']);
 
-		final json:PsychRaw = Parser.parse(FlatChart.config.fileSystem.getBytes(filepath).toString(), filepath).getField('song').value.getValue();
+		final json:PsychRaw = Parser.parse(FlatChart.config.fileSystem.getText(filepath), filepath).getField('song').value.getValue();
 
 		final result:FormatChart = {
 			variation: variation,
@@ -140,34 +143,38 @@ class PsychFormatWrapper extends FormatWrapper {
 			tracks: [{sound: 'Inst', startTime: json.offset ?? 0, endTime: 0}],
 			strumlines: [
 				{
-					x: 0.25,
+					position: [0.25, 50],
 					scale: 1,
 					alpha: 1,
 					characters: [json.player2],
 					charactersPosition: 0,
+					track: 1,
 					cpuControlled: true
 				},
 				{
-					x: 0.75,
+					position: [0.75, 50],
 					scale: 1,
 					alpha: 1,
 					characters: [json.player1],
 					charactersPosition: 1,
+					track: 1,
 					cpuControlled: false
 				},
 				{
-					x: 0.25,
+					position: [0.25, 50],
 					scale: 1,
 					alpha: 1,
 					characters: [json.gfVersion ?? json.player3 ?? 'gf'],
 					charactersPosition: 2,
+					track: 1,
 					cpuControlled: true
 				}
 			],
+			keyCount: 4,
 			notes: [],
 			events: [],
 			stage: json.stage,
-			extraData: [
+			extraValues: [
 				PsychExtraValue.GAME_OVER_CHAR => json.gameOverChar,
 				PsychExtraValue.GAME_OVER_SOUND => json.gameOverSound,
 				PsychExtraValue.GAME_OVER_LOOP => json.gameOverLoop,
@@ -201,7 +208,7 @@ class PsychFormatWrapper extends FormatWrapper {
 				result.events.push({
 					time: currentTime,
 					kind: 'Move Camera',
-					data: section.gfSection ? 2 : (section.mustHitSection ? 1 : 0)
+					data: [section.gfSection ? 2 : (section.mustHitSection ? 1 : 0)]
 				});
 			}
 
@@ -224,7 +231,7 @@ class PsychFormatWrapper extends FormatWrapper {
 			currentTime += section.sectionBeats != null ? section.sectionBeats * 60 / currentBPM * 1000 : section.lengthInSteps * 60 / currentBPM * 0.25 * 1000;
 		}
 
-		FlatChart.log(FlatChartLogLevel.Debug, 'Loaded chart from $filepath');
+		FlatChart.log(FlatChartLogLevel.DEBUG, 'Loaded chart from $filepath');
 		return result;
 	}
 }

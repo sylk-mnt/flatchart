@@ -5,15 +5,19 @@ import haxe.io.Bytes;
 import flatchart.FlatChart.FlatChartLogLevel;
 class FlixelFileSystem implements IFileSystem {
 	public function new() {
-		FlatChart.log(FlatChartLogLevel.Error, 'Flixel required to use FlixelFileSystem');
-	}
-
-	public function readDirectory(path:String):Array<String> {
-		return [];
+		FlatChart.log(FlatChartLogLevel.ERROR, 'Flixel required to use FlixelFileSystem');
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
 		return null;
+	}
+
+	public function getText(path:String):String {
+		return null;
+	}
+
+	public function readDirectory(path:String):Array<String> {
+		return [];
 	}
 
 	public function directoryExists(path:String):Bool {
@@ -34,6 +38,24 @@ using StringTools;
 class FlixelFileSystem implements IFileSystem {
 	public function new() {}
 
+	public function getBytes(path:String):Null<Bytes> {
+		if (!fileExists(path)) {
+			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			return null;
+		}
+
+		return FlxG.assets.getBytes(path);
+	}
+
+	public function getText(path:String):Null<String> {
+		if (!fileExists(path)) {
+			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			return null;
+		}
+
+		return FlxG.assets.getText(path);
+	}
+
 	public function readDirectory(path:String):Array<String> {
 		path = Path.addTrailingSlash(path);
 
@@ -46,15 +68,6 @@ class FlixelFileSystem implements IFileSystem {
 				result.push(trimmedPath);
 		}
 		return result;
-	}
-
-	public function getBytes(path:String):Null<Bytes> {
-		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.Error, 'There is no BINARY asset with ID "$path"');
-			return null;
-		}
-
-		return FlxG.assets.getBytes(path);
 	}
 
 	public function directoryExists(path:String):Bool {

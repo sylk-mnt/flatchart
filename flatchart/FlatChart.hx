@@ -39,7 +39,7 @@ import flatchart.fs.IFileSystem;
 	/**
 	 * Minimum log level to call the `onLog` callback.
 	 */
-	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.Warn;
+	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.WARNING;
 
 	/**
 	 * File system instance.
@@ -52,9 +52,9 @@ import flatchart.fs.IFileSystem;
 	public var formats:Array<Format> = [];
 
 	/**
-	 * Whether to use high detection accuracy.
+	 * Whether to read the file contents of the chart for high detection accuracy.
 	 */
-	public var highDetectionAccuracy:Bool = false;
+	public var readFileContents:Bool = false;
 }
 
 class FlatChart {
@@ -65,14 +65,14 @@ class FlatChart {
 	}
 
 	public static function detectFormat(path:String):Null<Format> {
-		log(FlatChartLogLevel.Info, 'Detecting format for $path');
+		log(FlatChartLogLevel.INFO, 'Detecting format for $path');
 		for (format in config.formats) {
 			if (format.isMatch(path)) {
-				log(FlatChartLogLevel.Info, 'Format detected for $path: ${format.getName()}');
+				log(FlatChartLogLevel.INFO, 'Format detected for $path: ${format.getName()}');
 				return format;
 			}
 		}
-		log(FlatChartLogLevel.Error, 'Format not detected for $path');
+		log(FlatChartLogLevel.ERROR, 'Format not detected for $path');
 		return null;
 	}
 
@@ -98,8 +98,8 @@ class FlatChart {
 }
 
 enum abstract FlatChartLogLevel(Int) to Int {
-	var Debug = 0;
-	var Info = 1;
-	var Warn = 2;
-	var Error = 3;
+	var DEBUG = 0;
+	var INFO = 1;
+	var WARNING = 2;
+	var ERROR = 3;
 }

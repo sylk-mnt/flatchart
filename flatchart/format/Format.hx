@@ -18,8 +18,6 @@ class Format {
 
 class FormatWrapper {
 	public final format:Format;
-
-	public var metadata:FormatMetadata;
 	public var charts:Array<FormatChart> = [];
 
 	public function new(format:Format) {
@@ -59,10 +57,11 @@ class FormatWrapper {
 	public var metadata:FormatMetadata;
 	public var tracks:Array<FormatTrack>;
 	public var strumlines:Array<FormatStrumline>;
+	public var keyCount:Int;
 	public var notes:Array<FormatNote>;
 	public var events:Array<FormatEvent>;
 	public var stage:Null<String>;
-	public var extraData:Map<String, Dynamic>;
+	public var extraValues:Map<String, Dynamic>;
 }
 
 @:structInit class FormatTrack {
@@ -72,13 +71,14 @@ class FormatWrapper {
 }
 
 @:structInit class FormatStrumline {
-	public var x:Float;
+	public var position:Array<Float>;
 	public var scale:Float;
 	public var alpha:Float;
 
 	public var characters:Array<String>;
 	public var charactersPosition:Int;
 
+	public var track:Int;
 	public var cpuControlled:Bool;
 }
 
