@@ -40,7 +40,7 @@ class FlixelFileSystem implements IFileSystem {
 
 	public function getBytes(path:String):Null<Bytes> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 
@@ -49,7 +49,7 @@ class FlixelFileSystem implements IFileSystem {
 
 	public function getText(path:String):Null<String> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 

@@ -9,7 +9,7 @@ import chartdex.Chartdex;
 function main() {
 	Chartdex.config = {
 		onLog: (_, message, ?pos) -> haxe.Log.trace(message, pos),
-		// logLevel: FlatChartLogLevel.DEBUG,
+		// logLevel: ChartdexLogLevel.DEBUG,
 		fileSystem: new SysFileSystem(),
 		formats: [new LegacyFormat(), new PsychFormat(), new CodenameFormat()],
 		readFileContents: true

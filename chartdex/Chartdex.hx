@@ -70,7 +70,7 @@ class Chartdex {
 	 */
 	public static function detectFormat(path:String):Null<Format> {
 		if (config == null)
-			throw 'FlatChart not configured';
+			throw 'Chartdex not configured';
 
 		log(ChartdexLogLevel.NOTICE, 'Detecting format for $path');
 		for (format in config.formats) {
@@ -91,7 +91,7 @@ class Chartdex {
 	 */
 	public static inline function wrapFormat(path:String, format:Format):FormatWrapper {
 		if (config == null)
-			throw 'FlatChart not configured';
+			throw 'Chartdex not configured';
 
 		return format.createWrapper().load(path);
 	}
@@ -104,7 +104,7 @@ class Chartdex {
 	 */
 	public static inline function detectAndWrapFormat(path:String):Null<FormatWrapper> {
 		if (config == null)
-			throw 'FlatChart not configured';
+			throw 'Chartdex not configured';
 
 		final format = detectFormat(path);
 		if (format == null)
@@ -121,7 +121,7 @@ class Chartdex {
 	 */
 	public static function log(level:ChartdexLogLevel, message:String, ?pos:PosInfos) {
 		if (config == null)
-			throw 'FlatChart not configured';
+			throw 'Chartdex not configured';
 
 		if ((level : Int) < (config.logLevel : Int))
 			return;
