@@ -58,6 +58,9 @@ package chartdex;
 	public var scale:Float;
 	public var alpha:Float;
 
+	public var noteSpeed:Float;
+	public var noteDirection:Float;
+
 	public var characters:Array<String>;
 	public var charactersPosition:Int;
 

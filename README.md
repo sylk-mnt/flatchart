@@ -7,11 +7,16 @@ Chartdex is a library designed to work with various Friday Night Funkin' chart f
 
 ## Features
 
-- Support for FNF Legacy/0.2.x chart format
 - Unified API for working with different chart formats
 - Handles chart metadata, tracks, strumlines, notes and events
 - Easy to extend with new format support
 - Polymod-like interface for simple integration
+
+## Supported Formats
+
+- Friday Night Funkin' Legacy/0.2.x
+- Psych Engine (WIP)
+- Codename Engine (WIP)
 
 ## Usage
 

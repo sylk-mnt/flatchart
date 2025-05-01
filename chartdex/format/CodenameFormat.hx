@@ -192,6 +192,8 @@ class CodenameFormatWrapper extends FormatWrapper {
 					],
 					scale: strumline.strumScale ?? 1,
 					alpha: strumline.visible != null ? (strumline.visible ? 1 : 0) : 1,
+					noteSpeed: json.scrollSpeed * (strumline.scrollSpeed ?? 1),
+					noteDirection: 90,
 					characters: strumline.characters,
 					charactersPosition: ['dad', 'boyfriend', 'girlfriend'].indexOf(strumline.position),
 					track: trackIndex,
