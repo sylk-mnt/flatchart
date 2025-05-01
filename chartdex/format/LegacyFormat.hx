@@ -91,12 +91,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 		Chartdex.log(ChartdexLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
 		for (variation in variations) {
-			final chart = _loadChart(path, variation);
-			if (chart == null) {
-				Chartdex.log(ChartdexLogLevel.ERROR, 'Failed to load chart for variation $variation');
-				continue;
-			}
-			charts.push(chart);
+			charts[variation] = _loadChart(path, variation);
 		}
 
 		return this;
@@ -121,7 +116,6 @@ class LegacyFormatWrapper extends FormatWrapper {
 		final json:LegacyRaw = Parser.parse(Chartdex.config.fileSystem.getText(filepath), filepath).getField('song').value.getValue();
 
 		final result:Chart = {
-			variation: variation,
 			metadata: {
 				title: json.song,
 				artist: Chartdex.config.defaultArtist,

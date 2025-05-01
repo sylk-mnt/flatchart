@@ -94,14 +94,8 @@ class PsychFormatWrapper extends FormatWrapper {
 		final variations = _readVariations(path);
 		Chartdex.log(ChartdexLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
-		for (variation in variations) {
-			final chart = _loadChart(path, variation);
-			if (chart == null) {
-				Chartdex.log(ChartdexLogLevel.ERROR, 'Failed to load chart for variation $variation');
-				continue;
-			}
-			charts.push(chart);
-		}
+		for (variation in variations)
+			charts[variation] = _loadChart(path, variation);
 
 		// TODO: Load events
 
@@ -127,7 +121,6 @@ class PsychFormatWrapper extends FormatWrapper {
 		final json:PsychRaw = Parser.parse(Chartdex.config.fileSystem.getText(filepath), filepath).getField('song').value.getValue();
 
 		final result:Chart = {
-			variation: variation,
 			metadata: {
 				title: json.song,
 				artist: Chartdex.config.defaultArtist,

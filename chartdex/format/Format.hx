@@ -27,7 +27,7 @@ class Format {
 
 class FormatWrapper {
 	public final format:Format;
-	public var charts:Array<Chart> = [];
+	public var charts:Map<String, Chart> = [];
 
 	public function new(format:Format) {
 		this.format = format;
@@ -36,13 +36,5 @@ class FormatWrapper {
 	public function load(path:String):FormatWrapper {
 		Chartdex.log(ChartdexLogLevel.WARNING, 'Loading ${format.getName()} from $path not implemented');
 		return this;
-	}
-
-	public function findChart(variation:String):Chart {
-		return Lambda.find(charts, chart -> chart.variation == variation);
-	}
-
-	public function hasChart(variation:String):Bool {
-		return findChart(variation) != null;
 	}
 }

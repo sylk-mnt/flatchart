@@ -89,9 +89,8 @@ class CodenameFormatWrapper extends FormatWrapper {
 		final variations = _readVariations(path);
 		Chartdex.log(ChartdexLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
-		for (variation in variations) {
-			charts.push(_loadChart(path, variation));
-		}
+		for (variation in variations)
+			charts[variation] = _loadChart(path, variation);
 
 		return this;
 	}
@@ -129,7 +128,6 @@ class CodenameFormatWrapper extends FormatWrapper {
 		}
 
 		final result:Chart = {
-			variation: variation,
 			metadata: {
 				title: json.meta.displayName ?? json.meta.name,
 				artist: Chartdex.config.defaultArtist,

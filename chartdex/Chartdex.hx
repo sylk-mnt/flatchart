@@ -65,7 +65,7 @@ class Chartdex {
 
 	/**
 	 * Detects the format of a chart.
-	 * @param path - The path to scan.
+	 * @param path The path to scan.
 	 * @return The format.
 	 */
 	public static function detectFormat(path:String):Null<Format> {
@@ -85,8 +85,8 @@ class Chartdex {
 
 	/**
 	 * Wraps a format in a wrapper.
-	 * @param path - The path to scan.
-	 * @param format - The format to wrap.
+	 * @param path The path to scan.
+	 * @param format The format to wrap.
 	 * @return The wrapped format.
 	 */
 	public static inline function wrapFormat(path:String, format:Format):FormatWrapper {
@@ -99,7 +99,7 @@ class Chartdex {
 	/**
 	 * Detects the format of a chart and wraps it.
 	 * If the format is not detected, returns `null`.
-	 * @param path - The path to scan.
+	 * @param path The path to scan.
 	 * @return The wrapped format.
 	 */
 	public static inline function detectAndWrapFormat(path:String):Null<FormatWrapper> {
@@ -115,9 +115,9 @@ class Chartdex {
 
 	/**
 	 * Logs a message.
-	 * @param level - The log level.
-	 * @param message - The message to log.
-	 * @param pos - The position of the message.
+	 * @param level The log level.
+	 * @param message The message to log.
+	 * @param pos The position of the message.
 	 */
 	public static function log(level:ChartdexLogLevel, message:String, ?pos:PosInfos) {
 		if (config == null)

@@ -34,10 +34,9 @@ function test(path:String) {
 			Sys.println('No format detected for $path!');
 		} else {
 			Sys.println('Format ${wrapper.format.getName()} detected and wrapped for $path!');
-
-			Sys.println('\tVariations: ${wrapper.charts.map(chart -> chart.variation).join(', ')}');
-			for (chart in wrapper.charts) {
-				Sys.println('\t\t${chart.variation}:');
+			Sys.println('\tVariations:');
+			for (variation => chart in wrapper.charts) {
+				Sys.println('\t\t$variation:');
 				Sys.println('\t\t\tTitle: ${chart.metadata.title}');
 				Sys.println('\t\t\tArtist: ${chart.metadata.artist}');
 				Sys.println('\t\t\tAlbum: ${chart.metadata.album}');

@@ -1,7 +1,6 @@
 package chartdex;
 
 @:structInit class Chart {
-	public var variation:String;
 	public var metadata:ChartMetadata;
 	public var tracks:Array<ChartTrack>;
 	public var strumlines:Array<ChartStrumline>;
