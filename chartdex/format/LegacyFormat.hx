@@ -1,9 +1,9 @@
-package flatchart.format;
+package chartdex.format;
 
 import hxjsonast.Json.JsonValue;
-import flatchart.FlatChart.FlatChartLogLevel;
+import chartdex.Chartdex.ChartdexLogLevel;
 import haxe.io.Path;
-import flatchart.format.Format;
+import chartdex.format.Format.FormatWrapper;
 import hxjsonast.Parser;
 
 using hxjsonast.Tools;
@@ -19,10 +19,10 @@ class LegacyFormat extends Format {
 	}
 
 	override function isMatch(path:String):Bool {
-		if (!FlatChart.config.fileSystem.directoryExists(path))
+		if (!Chartdex.config.fileSystem.directoryExists(path))
 			return false;
 
-		final filenames = FlatChart.config.fileSystem.readDirectory(path);
+		final filenames = Chartdex.config.fileSystem.readDirectory(path);
 		if (filenames.length == 0)
 			return false;
 
@@ -33,11 +33,11 @@ class LegacyFormat extends Format {
 			&& !Lambda.exists(filenames, filename -> filename.startsWith('$prefix-') && filename.endsWith('.json')))
 			return false;
 
-		if (FlatChart.config.readFileContents) {
+		if (Chartdex.config.readFileContents) {
 			for (filename in filenames) {
 				try {
 					final filepath = Path.join([path, filename]);
-					final json = Parser.parse(FlatChart.config.fileSystem.getText(filepath), filepath);
+					final json = Parser.parse(Chartdex.config.fileSystem.getText(filepath), filepath);
 
 					if (json.getField('song') == null)
 						return false;
@@ -64,7 +64,7 @@ class LegacyFormat extends Format {
 					}
 				}
 				catch (error) {
-					FlatChart.log(FlatChartLogLevel.ERROR, 'Error parsing $filename: $error');
+					Chartdex.log(ChartdexLogLevel.ERROR, 'Error parsing $filename: $error');
 					continue;
 				}
 			}
@@ -72,6 +72,8 @@ class LegacyFormat extends Format {
 
 		return true;
 	}
+
+	// TODO: Implement print
 }
 
 class LegacyFormatWrapper extends FormatWrapper {
@@ -80,18 +82,18 @@ class LegacyFormatWrapper extends FormatWrapper {
 	}
 
 	override function load(path:String):LegacyFormatWrapper {
-		if (!FlatChart.config.fileSystem.directoryExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, 'Directory not found: $path');
+		if (!Chartdex.config.fileSystem.directoryExists(path)) {
+			Chartdex.log(ChartdexLogLevel.ERROR, 'Directory not found: $path');
 			return this;
 		}
 
 		final variations = _readVariations(path);
-		FlatChart.log(FlatChartLogLevel.INFO, 'Found variations in $path: ${variations.join(', ')}');
+		Chartdex.log(ChartdexLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
 		for (variation in variations) {
 			final chart = _loadChart(path, variation);
 			if (chart == null) {
-				FlatChart.log(FlatChartLogLevel.ERROR, 'Failed to load chart for variation $variation');
+				Chartdex.log(ChartdexLogLevel.ERROR, 'Failed to load chart for variation $variation');
 				continue;
 			}
 			charts.push(chart);
@@ -103,31 +105,31 @@ class LegacyFormatWrapper extends FormatWrapper {
 	private function _readVariations(path:String):Array<String> {
 		final prefix = Path.withoutDirectory(path);
 
-		return FlatChart.config.fileSystem.readDirectory(path)
-			.filter(filename -> FlatChart.config.fileSystem.fileExists(Path.join([path, filename])))
+		return Chartdex.config.fileSystem.readDirectory(path)
+			.filter(filename -> Chartdex.config.fileSystem.fileExists(Path.join([path, filename])))
 			.map(filename -> {
 				if (filename == '$prefix.json')
-					return FlatChart.config.defaultVariation;
+					return Chartdex.config.defaultVariation;
 				else
 					return Path.withoutExtension(filename.substr(prefix.length + 1));
 			});
 	}
 
-	private function _loadChart(path:String, variation:String):FormatChart {
-		final filepath = variation == FlatChart.config.defaultVariation ? Path.join([path, '${Path.withoutDirectory(path)}.json']) : Path.join([path, '${Path.withoutDirectory(path)}-$variation.json']);
+	private function _loadChart(path:String, variation:String):Chart {
+		final filepath = variation == Chartdex.config.defaultVariation ? Path.join([path, '${Path.withoutDirectory(path)}.json']) : Path.join([path, '${Path.withoutDirectory(path)}-$variation.json']);
 
-		final json:LegacyRaw = Parser.parse(FlatChart.config.fileSystem.getText(filepath), filepath).getField('song').value.getValue();
+		final json:LegacyRaw = Parser.parse(Chartdex.config.fileSystem.getText(filepath), filepath).getField('song').value.getValue();
 
-		final result:FormatChart = {
+		final result:Chart = {
 			variation: variation,
 			metadata: {
 				title: json.song,
-				artist: FlatChart.config.defaultArtist,
-				album: FlatChart.config.defaultAlbum,
-				charter: FlatChart.config.defaultCharter,
+				artist: Chartdex.config.defaultArtist,
+				album: Chartdex.config.defaultAlbum,
+				charter: Chartdex.config.defaultCharter,
 				bpmChanges: [
 					{
-						time: 0,
+						time: -1,
 						bpm: json.bpm,
 						beatsPerMeasure: 4,
 						stepsPerBeat: 4
@@ -217,7 +219,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 			currentTime += section.lengthInSteps * 60 / currentBPM * 0.25 * 1000;
 		}
 
-		FlatChart.log(FlatChartLogLevel.DEBUG, 'Loaded chart from $filepath');
+		Chartdex.log(ChartdexLogLevel.DEBUG, 'Loaded chart from $filepath');
 		return result;
 	}
 }

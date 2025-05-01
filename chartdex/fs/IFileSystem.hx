@@ -1,4 +1,4 @@
-package flatchart.fs;
+package chartdex.fs;
 
 import haxe.io.Bytes;
 

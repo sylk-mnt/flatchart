@@ -1,18 +1,18 @@
-package flatchart.fs;
+package chartdex.fs;
 
+import chartdex.Chartdex.ChartdexLogLevel;
 import haxe.io.Bytes;
-#if !openfl
-import flatchart.FlatChart.FlatChartLogLevel;
-class OpenFlFileSystem implements IFileSystem {
+#if !flixel
+class FlixelFileSystem implements IFileSystem {
 	public function new() {
-		FlatChart.log(FlatChartLogLevel.ERROR, 'OpenFL required to use OpenFlFileSystem');
+		Chartdex.log(ChartdexLogLevel.ERROR, 'Flixel required to use FlixelFileSystem');
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
 		return null;
 	}
 
-	public function getText(path:String):Null<String> {
+	public function getText(path:String):String {
 		return null;
 	}
 
@@ -30,11 +30,12 @@ class OpenFlFileSystem implements IFileSystem {
 }
 #else
 import openfl.Assets;
+import flixel.FlxG;
 import haxe.io.Path;
 
 using StringTools;
 
-class OpenFlFileSystem implements IFileSystem {
+class FlixelFileSystem implements IFileSystem {
 	public function new() {}
 
 	public function getBytes(path:String):Null<Bytes> {
@@ -43,7 +44,7 @@ class OpenFlFileSystem implements IFileSystem {
 			return null;
 		}
 
-		return Assets.getBytes(path);
+		return FlxG.assets.getBytes(path);
 	}
 
 	public function getText(path:String):Null<String> {
@@ -52,13 +53,13 @@ class OpenFlFileSystem implements IFileSystem {
 			return null;
 		}
 
-		return Assets.getText(path);
+		return FlxG.assets.getText(path);
 	}
 
 	public function readDirectory(path:String):Array<String> {
 		path = Path.addTrailingSlash(path);
 
-		final assetIds = Assets.list().filter(assetId -> assetId.startsWith(path));
+		final assetIds = FlxG.assets.list().filter(assetId -> assetId.startsWith(path));
 
 		final result:Array<String> = [];
 		for (assetId in assetIds) {
@@ -75,11 +76,11 @@ class OpenFlFileSystem implements IFileSystem {
 		path = Path.normalize(sys.FileSystem.absolutePath(path));
 		#end
 
-		return Assets.list().filter(assetId -> Assets.getPath(assetId).startsWith(path)).length > 0;
+		return FlxG.assets.list().filter(assetId -> Assets.getPath(assetId).startsWith(path)).length > 0;
 	}
 
 	public function fileExists(path:String):Bool {
-		return Assets.exists(path);
+		return FlxG.assets.exists(path);
 	}
 }
 #end

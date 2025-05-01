@@ -1,2 +1,2 @@
--lib hxjsonast
+--library hxjsonast
 --run sample.Main

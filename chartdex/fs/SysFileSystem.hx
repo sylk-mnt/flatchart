@@ -1,11 +1,11 @@
-package flatchart.fs;
+package chartdex.fs;
 
-import flatchart.FlatChart.FlatChartLogLevel;
+import chartdex.Chartdex.ChartdexLogLevel;
 import haxe.io.Bytes;
 #if !sys
 class SysFileSystem implements IFileSystem {
 	public function new() {
-		FlatChart.log(FlatChartLogLevel.ERROR, 'Sys required to use SysFileSystem');
+		Chartdex.log(ChartdexLogLevel.ERROR, 'Sys required to use SysFileSystem');
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
@@ -37,7 +37,7 @@ class SysFileSystem implements IFileSystem {
 
 	public function getBytes(path:String):Null<Bytes> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 
@@ -46,7 +46,7 @@ class SysFileSystem implements IFileSystem {
 
 	public function getText(path:String):Null<String> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 

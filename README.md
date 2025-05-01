@@ -1,9 +1,9 @@
-# FlatChart
+# Chartdex
 
 > [!WARNING]
 > This project is still in early development and hasn't been thoroughly tested yet. There may be serious bugs and issues. Pull requests and issue reports are very welcome and appreciated!
 
-FlatChart is a library designed to work with various Friday Night Funkin' chart formats. It provides a unified wrapper interface to handle different chart formats seamlessly, with an API design inspired by [Polymod](https://github.com/larsiusprime/polymod.git).
+Chartdex is a library designed to work with various Friday Night Funkin' chart formats. It provides a unified wrapper interface to handle different chart formats seamlessly, with an API design inspired by [Polymod](https://github.com/larsiusprime/polymod.git).
 
 ## Features
 
@@ -17,16 +17,16 @@ FlatChart is a library designed to work with various Friday Night Funkin' chart 
 
 ### Basic Example
 ```haxe
-import flatchart.fs.SysFileSystem;
-import flatchart.FlatChart;
+import chartdex.fs.SysFileSystem;
+import chartdex.Chartdex;
 
-FlatChart.init({
+Chartdex.init({
 	fileSystem: new SysFileSystem(),
-	formats: [new LegacyFormat()]
+	formats: [new chartdex.format.LegacyFormat()]
 });
 
 final chartPath = 'assets/data/bopeebo';
-final wrapper = FlatChart.detectAndWrapFormat(chartPath, format);
+final wrapper = Chartdex.detectAndWrapFormat(chartPath, format);
 ```
 
 ## TODO

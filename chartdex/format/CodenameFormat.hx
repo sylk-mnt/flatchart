@@ -1,9 +1,9 @@
-package flatchart.format;
+package chartdex.format;
 
-import flatchart.FlatChart.FlatChartLogLevel;
+import chartdex.Chartdex.ChartdexLogLevel;
 import hxjsonast.Json.JsonValue;
 import haxe.io.Path;
-import flatchart.format.Format;
+import chartdex.format.Format.FormatWrapper;
 import hxjsonast.Parser;
 
 using hxjsonast.Tools;
@@ -19,20 +19,20 @@ class CodenameFormat extends Format {
 	}
 
 	override function isMatch(path:String):Bool {
-		if (!FlatChart.config.fileSystem.directoryExists(path))
+		if (!Chartdex.config.fileSystem.directoryExists(path))
 			return false;
 
-		final filenames = FlatChart.config.fileSystem.readDirectory(path);
-		FlatChart.log(FlatChartLogLevel.DEBUG, 'Filenames: ${filenames.join(', ')}');
+		final filenames = Chartdex.config.fileSystem.readDirectory(path);
+		Chartdex.log(ChartdexLogLevel.DEBUG, 'Filenames: ${filenames.join(', ')}');
 		if (filenames.length == 0)
 			return false;
 
 		if (!filenames.contains('meta.json'))
 			return false;
 
-		if (FlatChart.config.readFileContents) {
+		if (Chartdex.config.readFileContents) {
 			final filepath = Path.join([path, 'meta.json']);
-			final text = FlatChart.config.fileSystem.getText(filepath);
+			final text = Chartdex.config.fileSystem.getText(filepath);
 			if (text == null)
 				return false;
 
@@ -45,7 +45,7 @@ class CodenameFormat extends Format {
 				return false;
 
 			final chartsPath = Path.join([path, 'charts']);
-			final chartFiles = FlatChart.config.fileSystem.readDirectory(chartsPath);
+			final chartFiles = Chartdex.config.fileSystem.readDirectory(chartsPath);
 			if (chartFiles == null)
 				return false;
 
@@ -54,7 +54,7 @@ class CodenameFormat extends Format {
 					continue;
 
 				final chartPath = Path.join([chartsPath, filename]);
-				final chartText = FlatChart.config.fileSystem.getText(chartPath);
+				final chartText = Chartdex.config.fileSystem.getText(chartPath);
 				if (chartText == null)
 					continue;
 
@@ -71,6 +71,8 @@ class CodenameFormat extends Format {
 
 		return true;
 	}
+
+	// TODO: Implement print
 }
 
 class CodenameFormatWrapper extends FormatWrapper {
@@ -79,13 +81,13 @@ class CodenameFormatWrapper extends FormatWrapper {
 	}
 
 	override function load(path:String):CodenameFormatWrapper {
-		if (!FlatChart.config.fileSystem.directoryExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, 'Directory not found: $path');
+		if (!Chartdex.config.fileSystem.directoryExists(path)) {
+			Chartdex.log(ChartdexLogLevel.ERROR, 'Directory not found: $path');
 			return this;
 		}
 
 		final variations = _readVariations(path);
-		FlatChart.log(FlatChartLogLevel.INFO, 'Found variations in $path: ${variations.join(', ')}');
+		Chartdex.log(ChartdexLogLevel.DEBUG, 'Found variations in $path: ${variations.join(', ')}');
 
 		for (variation in variations) {
 			charts.push(_loadChart(path, variation));
@@ -96,18 +98,18 @@ class CodenameFormatWrapper extends FormatWrapper {
 
 	private function _readVariations(path:String):Array<String> {
 		final chartsPath = Path.join([path, 'charts']);
-		final files = FlatChart.config.fileSystem.readDirectory(chartsPath);
+		final files = Chartdex.config.fileSystem.readDirectory(chartsPath);
 		if (files == null)
 			return [];
 
 		return files.filter(filename -> filename.endsWith('.json')).map(filename -> Path.withoutExtension(filename));
 	}
 
-	private function _loadChart(path:String, variation:String):FormatChart {
+	private function _loadChart(path:String, variation:String):Chart {
 		final filepath = Path.join([path, 'charts', '$variation.json']);
-		final text = FlatChart.config.fileSystem.getText(filepath);
+		final text = Chartdex.config.fileSystem.getText(filepath);
 		if (text == null) {
-			FlatChart.log(FlatChartLogLevel.ERROR, 'Failed to read chart file: $filepath');
+			Chartdex.log(ChartdexLogLevel.ERROR, 'Failed to read chart file: $filepath');
 			return null;
 		}
 
@@ -116,7 +118,7 @@ class CodenameFormatWrapper extends FormatWrapper {
 		json.meta ??= _loadCodenameMeta(path, variation);
 
 		if (json.meta == null) {
-			FlatChart.log(FlatChartLogLevel.ERROR, 'Failed to load meta data for $filepath');
+			Chartdex.log(ChartdexLogLevel.ERROR, 'Failed to load meta data for $filepath');
 			json.meta = {
 				name: variation,
 				bpm: 100,
@@ -126,16 +128,16 @@ class CodenameFormatWrapper extends FormatWrapper {
 			};
 		}
 
-		final result:FormatChart = {
+		final result:Chart = {
 			variation: variation,
 			metadata: {
 				title: json.meta.displayName ?? json.meta.name,
-				artist: FlatChart.config.defaultArtist,
-				album: FlatChart.config.defaultAlbum,
-				charter: FlatChart.config.defaultCharter,
+				artist: Chartdex.config.defaultArtist,
+				album: Chartdex.config.defaultAlbum,
+				charter: Chartdex.config.defaultCharter,
 				bpmChanges: [
 					{
-						time: 0,
+						time: -1,
 						bpm: json.meta.bpm ?? 100,
 						beatsPerMeasure: json.meta.beatsPerMeasure ?? 4,
 						stepsPerBeat: json.meta.stepsPerBeat ?? 4
@@ -244,8 +246,8 @@ class CodenameFormatWrapper extends FormatWrapper {
 		final filepaths = [Path.join([path, 'meta-$variation.json']), Path.join([path, 'meta.json'])];
 		for (filepath in filepaths) {
 			try {
-				if (FlatChart.config.fileSystem.fileExists(filepath)) {
-					final text = FlatChart.config.fileSystem.getText(filepath);
+				if (Chartdex.config.fileSystem.fileExists(filepath)) {
+					final text = Chartdex.config.fileSystem.getText(filepath);
 					if (text == null)
 						continue;
 
@@ -254,7 +256,7 @@ class CodenameFormatWrapper extends FormatWrapper {
 				}
 			}
 			catch (error) {
-				FlatChart.log(FlatChartLogLevel.ERROR, 'Error parsing $filepath: $error');
+				Chartdex.log(ChartdexLogLevel.ERROR, 'Error parsing $filepath: $error');
 			}
 		}
 		return null;

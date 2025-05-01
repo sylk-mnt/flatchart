@@ -1,10 +1,10 @@
-package flatchart;
+package chartdex;
 
 import haxe.PosInfos;
-import flatchart.format.Format;
-import flatchart.fs.IFileSystem;
+import chartdex.format.Format;
+import chartdex.fs.IFileSystem;
 
-@:structInit class FlatChartConfig {
+@:structInit class ChartdexConfig {
 	/**
 	 * Default title for the chart. Used when no title is specified.
 	 */
@@ -34,12 +34,12 @@ import flatchart.fs.IFileSystem;
 	 * Callback function for logging events.
 	 * Takes a log level and message as parameters.
 	 */
-	public var onLog:(FlatChartLogLevel, String, ?PosInfos) -> Void = (_, _, ?_) -> {};
+	public var onLog:(ChartdexLogLevel, String, ?PosInfos) -> Void = (_, _, ?_) -> {};
 
 	/**
 	 * Minimum log level to call the `onLog` callback.
 	 */
-	public var logLevel:FlatChartLogLevel = FlatChartLogLevel.WARNING;
+	public var logLevel:ChartdexLogLevel = ChartdexLogLevel.WARNING;
 
 	/**
 	 * File system instance.
@@ -57,30 +57,55 @@ import flatchart.fs.IFileSystem;
 	public var readFileContents:Bool = false;
 }
 
-class FlatChart {
-	public static var config:FlatChartConfig;
+class Chartdex {
+	/**
+	 * Library configuration.
+	 */
+	public static var config:ChartdexConfig;
 
-	public static function init(config:FlatChartConfig) {
-		FlatChart.config = config;
-	}
-
+	/**
+	 * Detects the format of a chart.
+	 * @param path - The path to scan.
+	 * @return The format.
+	 */
 	public static function detectFormat(path:String):Null<Format> {
-		log(FlatChartLogLevel.INFO, 'Detecting format for $path');
+		if (config == null)
+			throw 'FlatChart not configured';
+
+		log(ChartdexLogLevel.NOTICE, 'Detecting format for $path');
 		for (format in config.formats) {
 			if (format.isMatch(path)) {
-				log(FlatChartLogLevel.INFO, 'Format detected for $path: ${format.getName()}');
+				log(ChartdexLogLevel.NOTICE, 'Format detected for $path: ${format.getName()}');
 				return format;
 			}
 		}
-		log(FlatChartLogLevel.ERROR, 'Format not detected for $path');
+		log(ChartdexLogLevel.ERROR, 'Format not detected for $path');
 		return null;
 	}
 
+	/**
+	 * Wraps a format in a wrapper.
+	 * @param path - The path to scan.
+	 * @param format - The format to wrap.
+	 * @return The wrapped format.
+	 */
 	public static inline function wrapFormat(path:String, format:Format):FormatWrapper {
+		if (config == null)
+			throw 'FlatChart not configured';
+
 		return format.createWrapper().load(path);
 	}
 
+	/**
+	 * Detects the format of a chart and wraps it.
+	 * If the format is not detected, returns `null`.
+	 * @param path - The path to scan.
+	 * @return The wrapped format.
+	 */
 	public static inline function detectAndWrapFormat(path:String):Null<FormatWrapper> {
+		if (config == null)
+			throw 'FlatChart not configured';
+
 		final format = detectFormat(path);
 		if (format == null)
 			return null;
@@ -88,7 +113,16 @@ class FlatChart {
 		return wrapFormat(path, format);
 	}
 
-	public static function log(level:FlatChartLogLevel, message:String, ?pos:PosInfos) {
+	/**
+	 * Logs a message.
+	 * @param level - The log level.
+	 * @param message - The message to log.
+	 * @param pos - The position of the message.
+	 */
+	public static function log(level:ChartdexLogLevel, message:String, ?pos:PosInfos) {
+		if (config == null)
+			throw 'FlatChart not configured';
+
 		if ((level : Int) < (config.logLevel : Int))
 			return;
 
@@ -97,9 +131,9 @@ class FlatChart {
 	}
 }
 
-enum abstract FlatChartLogLevel(Int) to Int {
+enum abstract ChartdexLogLevel(Int) to Int {
 	var DEBUG = 0;
-	var INFO = 1;
+	var NOTICE = 1;
 	var WARNING = 2;
 	var ERROR = 3;
 }

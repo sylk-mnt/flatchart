@@ -1,11 +1,11 @@
-package flatchart.fs;
+package chartdex.fs;
 
+import chartdex.Chartdex.ChartdexLogLevel;
 import haxe.io.Bytes;
-#if !lime
-import flatchart.FlatChart.FlatChartLogLevel;
-class LimeFileSystem implements IFileSystem {
+#if !openfl
+class OpenFlFileSystem implements IFileSystem {
 	public function new() {
-		FlatChart.log(FlatChartLogLevel.ERROR, 'Lime required to use LimeFileSystem');
+		Chartdex.log(ChartdexLogLevel.ERROR, 'OpenFL required to use OpenFlFileSystem');
 	}
 
 	public function getBytes(path:String):Null<Bytes> {
@@ -29,17 +29,17 @@ class LimeFileSystem implements IFileSystem {
 	}
 }
 #else
-import lime.utils.Assets;
+import openfl.Assets;
 import haxe.io.Path;
 
 using StringTools;
 
-class LimeFileSystem implements IFileSystem {
+class OpenFlFileSystem implements IFileSystem {
 	public function new() {}
 
 	public function getBytes(path:String):Null<Bytes> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 
@@ -48,7 +48,7 @@ class LimeFileSystem implements IFileSystem {
 
 	public function getText(path:String):Null<String> {
 		if (!fileExists(path)) {
-			FlatChart.log(FlatChartLogLevel.ERROR, '$path does not exist');
+			Chartdex.log(ChartdexLogLevel.ERROR, '$path does not exist');
 			return null;
 		}
 
