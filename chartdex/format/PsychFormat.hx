@@ -123,9 +123,9 @@ class PsychFormatWrapper extends FormatWrapper {
 		final result:Chart = {
 			metadata: {
 				title: json.song,
-				artist: Chartdex.config.defaultArtist,
+				artist: json.artist ?? Chartdex.config.defaultArtist,
 				album: Chartdex.config.defaultAlbum,
-				charter: Chartdex.config.defaultCharter,
+				charter: json.charter ?? Chartdex.config.defaultCharter,
 				bpmChanges: [
 					{
 						time: -1,
@@ -162,7 +162,7 @@ class PsychFormatWrapper extends FormatWrapper {
 				{
 					position: [0.25, 50],
 					scale: 1,
-					alpha: 1,
+					alpha: 0,
 					noteSpeed: json.speed,
 					noteDirection: 90,
 					characters: [json.gfVersion ?? json.player3 ?? 'gf'],
@@ -171,7 +171,6 @@ class PsychFormatWrapper extends FormatWrapper {
 					cpuControlled: true
 				}
 			],
-			keyCount: 4,
 			notes: [],
 			events: [],
 			stage: json.stage,
@@ -218,14 +217,19 @@ class PsychFormatWrapper extends FormatWrapper {
 				var id:Int = note[1];
 				var length:Float = note[2];
 
-				var strumline = section.gfSection ? 2 : (id >= 4 ? (section.mustHitSection ? 0 : 1) : (section.mustHitSection ? 1 : 0));
+				var strumline = section.gfSection ? 2 : 0;
+				if (section.mustHitSection)
+					strumline = id >= 4 ? 0 : 1;
+				else
+					strumline = id >= 4 ? 1 : 0;
+
 				id %= 4;
 
 				result.notes.push({
 					time: time,
-					sustain: length,
+					length: length,
 					lane: id + 4 * strumline,
-					kind: section.altAnim ? 'alt' : 'default'
+					kind: section.altAnim ? 'alt-anim' : null
 				});
 			}
 
@@ -238,6 +242,8 @@ class PsychFormatWrapper extends FormatWrapper {
 }
 
 typedef PsychRaw = {
+	@:optional var charter:Null<String>;
+	@:optional var artist:Null<String>;
 	var song:String;
 	var notes:Array<PsychRawSection>;
 	var events:Array<Array<Dynamic>>;

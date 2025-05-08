@@ -150,7 +150,6 @@ class CodenameFormatWrapper extends FormatWrapper {
 				}
 			],
 			strumlines: [],
-			keyCount: 4,
 			notes: [],
 			events: [],
 			stage: json.stage,
@@ -204,9 +203,9 @@ class CodenameFormatWrapper extends FormatWrapper {
 					for (note in strumline.notes) {
 						result.notes.push({
 							time: note.time,
-							sustain: note.sLen ?? 0,
-							lane: i * result.keyCount + note.id,
-							kind: note.type == 0 ? 'default' : json.noteTypes[note.type - 1]
+							length: note.sLen ?? 0,
+							lane: i * 4 + note.id,
+							kind: note.type == 0 ? null : json.noteTypes[note.type - 1]
 						});
 					}
 				}

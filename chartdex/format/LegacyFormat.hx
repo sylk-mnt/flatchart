@@ -157,7 +157,7 @@ class LegacyFormatWrapper extends FormatWrapper {
 				{
 					position: [0.25, 50],
 					scale: 1,
-					alpha: 1,
+					alpha: 0,
 					noteSpeed: json.speed,
 					noteDirection: 90,
 					characters: ['gf'],
@@ -166,7 +166,6 @@ class LegacyFormatWrapper extends FormatWrapper {
 					cpuControlled: true
 				}
 			],
-			keyCount: 4,
 			notes: [],
 			events: [],
 			stage: null,
@@ -210,10 +209,9 @@ class LegacyFormatWrapper extends FormatWrapper {
 
 				result.notes.push({
 					time: time,
-					sustain: length,
+					length: length,
 					lane: id + 4 * strumline,
-					kind: section.altAnim ? 'alt' : 'default'
-				});
+					kind: section.altAnim || note[3] ? 'alt-anim' : null});
 			}
 
 			currentTime += section.lengthInSteps * 60 / currentBPM * 0.25 * 1000;

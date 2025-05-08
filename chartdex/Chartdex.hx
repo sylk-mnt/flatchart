@@ -102,7 +102,7 @@ class Chartdex {
 	 * @param path The path to scan.
 	 * @return The wrapped format.
 	 */
-	public static inline function detectAndWrapFormat(path:String):Null<FormatWrapper> {
+	public static function detectAndWrapFormat(path:String):Null<FormatWrapper> {
 		if (config == null)
 			throw 'Chartdex not configured';
 

@@ -4,7 +4,6 @@ package chartdex;
 	public var metadata:ChartMetadata;
 	public var tracks:Array<ChartTrack>;
 	public var strumlines:Array<ChartStrumline>;
-	public var keyCount:Int;
 	public var notes:Array<ChartNote>;
 	public var events:Array<ChartEvent>;
 	public var stage:Null<String>;
@@ -70,9 +69,9 @@ package chartdex;
 
 @:structInit class ChartNote {
 	public var time:Float;
-	public var sustain:Float;
+	public var length:Float;
+	public var kind:Null<String>;
 	public var lane:Int;
-	public var kind:String;
 }
 
 @:structInit class ChartEvent {
